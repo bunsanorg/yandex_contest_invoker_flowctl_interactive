@@ -16,6 +16,7 @@ bunsan_use(
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Broker.cpp
+    src/lib/CommandIo.cpp
 )
 
 yandex_contest_add_binary_targets(bin_targets
