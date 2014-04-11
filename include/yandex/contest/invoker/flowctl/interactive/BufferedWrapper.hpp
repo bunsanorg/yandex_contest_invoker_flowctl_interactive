@@ -90,6 +90,12 @@ namespace yandex{namespace contest{namespace invoker{
             sinkBuffer_.close();
         }
 
+        void terminate()
+        {
+            sourceBuffer_.terminate();
+            sinkBuffer_.terminate();
+        }
+
     private:
         UnderlyingSource &underlyingSource_;
         UnderlyingSink &underlyingSink_;
