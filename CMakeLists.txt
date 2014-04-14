@@ -21,7 +21,7 @@ bunsan_add_shared_library(${PROJECT_NAME}
 )
 
 yandex_contest_add_binary_targets(bin_targets
-    broker
+    simple_broker
 )
 
 bunsan_install_headers()
