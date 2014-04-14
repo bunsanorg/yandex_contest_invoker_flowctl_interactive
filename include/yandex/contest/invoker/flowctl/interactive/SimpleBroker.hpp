@@ -15,10 +15,10 @@ namespace yandex{namespace contest{namespace invoker{
     public:
         struct Options
         {
-            int interactorBrokerFd = -1;
-            int brokerInteractorFd = -1;
-            int solutionBrokerFd = -1;
-            int brokerSolutionFd = -1;
+            int interactorSourceFd = -1;
+            int interactorSinkFd = -1;
+            int solutionSourceFd = -1;
+            int solutionSinkFd = -1;
 
             std::size_t outputLimitBytes = 0;
             std::chrono::milliseconds terminationRealTimeLimit{0};

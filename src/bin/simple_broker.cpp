@@ -19,27 +19,27 @@ int main(int argc, char *argv[])
     {
         desc.add_options()
             (
-                "interactor-to-broker",
+                "interactor-source",
                 po::value<int>(
-                    &options.interactorBrokerFd)->required(),
+                    &options.interactorSourceFd)->required(),
                 "interactor > broker file descriptor"
             )
             (
-                "broker-to-interactor",
+                "interactor-sink",
                 po::value<int>(
-                    &options.brokerInteractorFd)->required(),
+                    &options.interactorSinkFd)->required(),
                 "broker > interactor file descriptor"
             )
             (
-                "solution-to-broker",
+                "solution-source",
                 po::value<int>(
-                    &options.solutionBrokerFd)->required(),
+                    &options.solutionSourceFd)->required(),
                 "solution > broker file descriptor"
             )
             (
-                "broker-to-solution",
+                "solution-sink",
                 po::value<int>(
-                    &options.brokerSolutionFd)->required(),
+                    &options.solutionSinkFd)->required(),
                 "broker > solution file descriptor"
             )
             (
