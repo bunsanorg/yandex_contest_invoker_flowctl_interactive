@@ -15,6 +15,7 @@ namespace yandex{namespace contest{namespace invoker{
     public:
         struct Options
         {
+            int notifierFd = -1;
             int interactorSourceFd = -1;
             int interactorSinkFd = -1;
             int solutionSourceFd = -1;

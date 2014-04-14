@@ -12,6 +12,7 @@ bunsan_use_bunsan(common)
 bunsan_use(
     yandex_contest_common
     yandex_contest_system
+    yandex_contest_invoker
 )
 
 bunsan_add_shared_library(${PROJECT_NAME}

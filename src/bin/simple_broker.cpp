@@ -19,6 +19,12 @@ int main(int argc, char *argv[])
     {
         desc.add_options()
             (
+                "notifier",
+                po::value<int>(
+                    &options.notifierFd)->required(),
+                "notifier file descriptor"
+            )
+            (
                 "interactor-source",
                 po::value<int>(
                     &options.interactorSourceFd)->required(),
