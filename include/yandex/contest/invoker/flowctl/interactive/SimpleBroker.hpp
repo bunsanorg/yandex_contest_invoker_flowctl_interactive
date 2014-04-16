@@ -28,6 +28,7 @@ namespace yandex{namespace contest{namespace invoker{
         BUNSAN_INCLASS_STREAM_ENUM_INITIALIZED(Status,
         (
             (OK, 0),
+            (FAILED, 1),
 
             (INTERACTOR_OUTPUT_LIMIT_EXCEEDED, 100),
             (SOLUTION_OUTPUT_LIMIT_EXCEEDED, 101),
