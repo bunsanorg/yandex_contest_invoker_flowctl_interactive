@@ -49,22 +49,35 @@ namespace yandex{namespace contest{namespace invoker{
     SimpleBroker::Status SimpleBroker::run()
     {
         boost::asio::io_service ioService;
+
+        STREAM_INFO << "Using " << options_.solutionSourceFd << " " <<
+                       "as solution source file descriptor";
         boost::asio::posix::stream_descriptor solutionSource(
             ioService,
             options_.solutionSourceFd
         );
+
+        STREAM_INFO << "Using " << options_.solutionSinkFd << " " <<
+                       "as solution sink file descriptor";
         boost::asio::posix::stream_descriptor solutionSink(
             ioService,
             options_.solutionSinkFd
         );
+
+        STREAM_INFO << "Using " << options_.interactorSourceFd << " " <<
+                       "as interactor source file descriptor";
         boost::asio::posix::stream_descriptor interactorSource(
             ioService,
             options_.interactorSourceFd
         );
+
+        STREAM_INFO << "Using " << options_.interactorSinkFd << " " <<
+                       "as interactor sink file descriptor";
         boost::asio::posix::stream_descriptor interactorSink(
             ioService,
             options_.interactorSinkFd
         );
+
         BufferedConnection connection(
             interactorSource,
             interactorSink,
@@ -72,6 +85,9 @@ namespace yandex{namespace contest{namespace invoker{
             solutionSink,
             options_.outputLimitBytes
         );
+
+        STREAM_INFO << "Using " << options_.notifierFd << " " <<
+                       "as notifier file descriptor";
         Notifier notifier(ioService, options_.notifierFd);
 
         TerminationTimer interactorTerminationTimer(ioService);
@@ -218,7 +234,9 @@ namespace yandex{namespace contest{namespace invoker{
                 STREAM_INFO << "Solution write failure: " << ec.message();
             });
 
+        STREAM_INFO << "Starting execution loop";
         ioService.run();
+        STREAM_INFO << "Execution loop has finished";
 
         BOOST_ASSERT(interactorTerminated);
         BOOST_ASSERT(solutionTerminated);
