@@ -17,6 +17,7 @@ bunsan_use(
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Broker.cpp
+    src/lib/BufferedConnection.cpp
     src/lib/SimpleBroker.cpp
     src/lib/CommandIo.cpp
 )
