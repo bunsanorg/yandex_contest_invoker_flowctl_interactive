@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
                 run(),
                 vm
             );
+            po::notify(vm);
             options.terminationRealTimeLimit =
                 std::chrono::milliseconds(terminationRealTimeLimitMillis);
 
