@@ -234,6 +234,12 @@ namespace yandex{namespace contest{namespace invoker{
                 STREAM_INFO << "Solution write failure: " << ec.message();
             });
 
+        STREAM_INFO << "Starting connection";
+        connection.start();
+
+        STREAM_INFO << "Starting notifier";
+        notifier.start();
+
         STREAM_INFO << "Starting execution loop";
         ioService.run();
         STREAM_INFO << "Execution loop has finished";
