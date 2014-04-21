@@ -172,20 +172,28 @@ namespace yandex{namespace contest{namespace invoker{
         connection.solutionEof.connect(waitForSolutionTermination);
 
         interactorTermination.connect(
-            [&](const yandex::contest::invoker::process::Result &result)
+            [&](const yandex::contest::invoker::process::Result &processResult)
             {
+                BOOST_ASSERT(!interactorTerminated);
                 interactorTerminated = true;
                 interactorTerminationTimer.cancel();
-                if (result)
+                if (processResult)
                     connection.closeInteractorToSolution();
                 waitForSolutionTermination();
+
+                if (solutionTerminated)
+                    result(OK);
             });
 
         solutionTermination.connect(
-            [&](const yandex::contest::invoker::process::Result &/*result*/)
+            [&](const yandex::contest::invoker::process::Result &/*processResult*/)
             {
+                BOOST_ASSERT(!solutionTerminated);
                 solutionTerminated = true;
                 solutioninTerminationTimer.cancel();
+
+                if (interactorTerminated)
+                    result(OK);
             });
 
         connection.interactorOutputLimitExceeded.connect(
