@@ -6,6 +6,7 @@
 #include <yandex/contest/invoker/Notifier.hpp>
 
 #include <boost/asio/steady_timer.hpp>
+#include <boost/optional.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/once.hpp>
@@ -103,8 +104,8 @@ namespace yandex{namespace contest{namespace invoker{
         TerminationSignal interactorTermination;
         TerminationSignal solutionTermination;
 
-        bool interactorTerminated = false;
-        bool solutionTerminated = false;
+        boost::optional<process::Result> interactorResult;
+        boost::optional<process::Result> solutionResult;
 
         bool solutionExcessData = false;
 
@@ -176,8 +177,8 @@ namespace yandex{namespace contest{namespace invoker{
         interactorTermination.connect(
             [&](const yandex::contest::invoker::process::Result &processResult)
             {
-                BOOST_ASSERT(!interactorTerminated);
-                interactorTerminated = true;
+                BOOST_ASSERT(!interactorResult);
+                interactorResult = processResult;
                 interactorTerminationTimer.cancel();
                 if (processResult)
                 {
@@ -190,18 +191,18 @@ namespace yandex{namespace contest{namespace invoker{
                 }
                 waitForSolutionTermination();
 
-                if (solutionTerminated)
+                if (solutionResult)
                     result(OK);
             });
 
         solutionTermination.connect(
-            [&](const yandex::contest::invoker::process::Result &/*processResult*/)
+            [&](const yandex::contest::invoker::process::Result &processResult)
             {
-                BOOST_ASSERT(!solutionTerminated);
-                solutionTerminated = true;
+                BOOST_ASSERT(!solutionResult);
+                solutionResult = processResult;
                 solutioninTerminationTimer.cancel();
 
-                if (interactorTerminated)
+                if (interactorResult)
                     result(OK);
             });
 
@@ -228,8 +229,16 @@ namespace yandex{namespace contest{namespace invoker{
                 STREAM_ERROR << "Interactor write failure: " << ec.message();
                 if (ec == boost::asio::error::broken_pipe)
                 {
-                    solutionExcessData = true;
-                    waitForInteractorTermination();
+                    if (interactorResult)
+                    {
+                        if (*interactorResult)
+                            result(SOLUTION_EXCESS_DATA);
+                    }
+                    else
+                    {
+                        solutionExcessData = true;
+                        waitForInteractorTermination();
+                    }
                 }
                 else
                 {
@@ -262,10 +271,14 @@ namespace yandex{namespace contest{namespace invoker{
         ioService.run();
         STREAM_INFO << "Execution loop has finished";
 
-        if (status == OK)
+        // The only possible way to stop execution loop
+        // is to call result(), so status is set.
+        BOOST_ASSERT(status);
+
+        if (*status == OK)
         {
-            BOOST_ASSERT(interactorTerminated);
-            BOOST_ASSERT(solutionTerminated);
+            BOOST_ASSERT(interactorResult);
+            BOOST_ASSERT(solutionResult);
         }
 
         return *status;
