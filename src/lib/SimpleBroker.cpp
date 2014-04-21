@@ -252,9 +252,11 @@ namespace yandex{namespace contest{namespace invoker{
         ioService.run();
         STREAM_INFO << "Execution loop has finished";
 
-        BOOST_ASSERT(interactorTerminated);
-        BOOST_ASSERT(solutionTerminated);
-        BOOST_ASSERT(status);
+        if (status == OK)
+        {
+            BOOST_ASSERT(interactorTerminated);
+            BOOST_ASSERT(solutionTerminated);
+        }
 
         return *status;
     }
