@@ -196,17 +196,13 @@ namespace yandex{namespace contest{namespace invoker{
                     result(OK);
             });
 
-        connection.interactorOutputLimitExceeded.connect(
-            [&]()
-            {
-                result(INTERACTOR_OUTPUT_LIMIT_EXCEEDED);
-            });
+        connection.interactorOutputLimitExceeded.connect([&]{
+            result(INTERACTOR_OUTPUT_LIMIT_EXCEEDED);
+        });
 
-        connection.solutionOutputLimitExceeded.connect(
-            [&]()
-            {
-                result(SOLUTION_OUTPUT_LIMIT_EXCEEDED);
-            });
+        connection.solutionOutputLimitExceeded.connect([&]{
+            result(SOLUTION_OUTPUT_LIMIT_EXCEEDED);
+        });
 
         connection.interactorReadError.connect(
             [&](const boost::system::error_code &ec,
