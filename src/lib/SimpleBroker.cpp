@@ -106,6 +106,8 @@ namespace yandex{namespace contest{namespace invoker{
         bool interactorTerminated = false;
         bool solutionTerminated = false;
 
+        bool solutionExcessData = false;
+
         const auto result =
             [&](const Status status_)
             {
@@ -178,7 +180,14 @@ namespace yandex{namespace contest{namespace invoker{
                 interactorTerminated = true;
                 interactorTerminationTimer.cancel();
                 if (processResult)
+                {
+                    if (solutionExcessData)
+                    {
+                        result(SOLUTION_EXCESS_DATA);
+                        return;
+                    }
                     connection.closeInteractorToSolution();
+                }
                 waitForSolutionTermination();
 
                 if (solutionTerminated)
@@ -218,9 +227,14 @@ namespace yandex{namespace contest{namespace invoker{
             {
                 STREAM_ERROR << "Interactor write failure: " << ec.message();
                 if (ec == boost::asio::error::broken_pipe)
-                    result(SOLUTION_EXCESS_DATA);
+                {
+                    solutionExcessData = true;
+                    waitForInteractorTermination();
+                }
                 else
+                {
                     result(FAILED);
+                }
             });
 
         connection.solutionReadError.connect(
