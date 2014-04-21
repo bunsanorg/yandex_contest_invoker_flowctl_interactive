@@ -2,6 +2,8 @@
 
 #include <yandex/contest/detail/LogHelper.hpp>
 
+#include <boost/asio/detail/signal_init.hpp>
+
 namespace yandex{namespace contest{namespace invoker{
     namespace flowctl{namespace interactive
 {
@@ -45,6 +47,8 @@ namespace yandex{namespace contest{namespace invoker{
             ),
             outputLimitBytes_(outputLimitBytes)
     {
+        boost::asio::detail::signal_init<SIGPIPE> sigpipe_init;
+
         interactorToSolutionBuffer_.set_close_sink_on_eof(false);
         interactorToSolutionBuffer_.set_discard_on_sink_error(true);
 
