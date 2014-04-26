@@ -123,6 +123,7 @@ namespace yandex{namespace contest{namespace invoker{
         const auto waitForInteractorTermination =
             [&]()
             {
+                STREAM_INFO << "Waiting for interactor's termination...";
                 interactorTerminationTimer.async_wait(
                     options_.terminationRealTimeLimit,
                     [&](const boost::system::error_code &ec)
@@ -136,6 +137,7 @@ namespace yandex{namespace contest{namespace invoker{
         const auto waitForSolutionTermination =
             [&]()
             {
+                STREAM_INFO << "Waiting for solution's termination";
                 solutioninTerminationTimer.async_wait(
                     options_.terminationRealTimeLimit,
                     [&](const boost::system::error_code &ec)
@@ -182,12 +184,18 @@ namespace yandex{namespace contest{namespace invoker{
                 interactorTerminationTimer.cancel();
                 if (processResult)
                 {
+                    STREAM_INFO << "Interactor has terminated OK";
                     if (solutionExcessData)
                     {
                         result(SOLUTION_EXCESS_DATA);
                         return;
                     }
+                    STREAM_INFO << "Closing solution's STDIN";
                     connection.closeInteractorToSolution();
+                }
+                else
+                {
+                    STREAM_INFO << "Interactor has terminated not OK, solution's STDIN left intact";
                 }
                 waitForSolutionTermination();
 
@@ -280,6 +288,8 @@ namespace yandex{namespace contest{namespace invoker{
             BOOST_ASSERT(interactorResult);
             BOOST_ASSERT(solutionResult);
         }
+
+        STREAM_INFO << "Completed with status = " << *status;
 
         return *status;
     }
