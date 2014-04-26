@@ -194,9 +194,15 @@ namespace yandex{namespace contest{namespace invoker{
                     STREAM_INFO << "Closing solution's STDIN";
                     connection.closeInteractorToSolution();
                 }
-                else
+                else if (processResult.exitStatus)
                 {
                     STREAM_INFO << "Interactor has terminated not OK, solution's STDIN left intact";
+                }
+                else
+                {
+                    STREAM_INFO << "Interactor has failed to exit";
+                    result(FAILED);
+                    return;
                 }
                 waitForSolutionTermination();
 
