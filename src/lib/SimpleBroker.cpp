@@ -6,6 +6,7 @@
 #include <yandex/contest/invoker/Notifier.hpp>
 
 #include <boost/asio/steady_timer.hpp>
+#include <boost/io/detail/quoted_manip.hpp>
 #include <boost/optional.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
@@ -166,7 +167,7 @@ namespace yandex{namespace contest{namespace invoker{
         notifier.onTermination(
             [&](const Notifier::Termination::Event &event)
             {
-                STREAM_INFO << event.meta.name << " has terminated";
+                STREAM_INFO << boost::io::quoted(event.meta.name) << " has terminated";
                 if (event.meta.name == "interactor")
                     interactorTermination(event.result);
                 else if (event.meta.name == "solution")
