@@ -181,7 +181,8 @@ namespace yandex{namespace contest{namespace invoker{
         notifier.onTermination(
             [&](const Notifier::Termination::Event &event)
             {
-                STREAM_INFO << boost::io::quoted(event.meta.name) << " has terminated";
+                STREAM_INFO << boost::io::quoted(event.meta.name) <<
+                               " has terminated";
                 if (event.meta.name == "interactor")
                     interactorTermination(event.result);
                 else if (event.meta.name == "solution")
@@ -210,7 +211,8 @@ namespace yandex{namespace contest{namespace invoker{
                 }
                 else if (processResult.exitStatus)
                 {
-                    STREAM_INFO << "Interactor has terminated not OK, solution's STDIN left intact";
+                    STREAM_INFO << "Interactor has terminated not OK, " <<
+                                   "solution's STDIN left intact";
                 }
                 else
                 {
