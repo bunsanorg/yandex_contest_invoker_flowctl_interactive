@@ -2,7 +2,9 @@
 
 #include <bunsan/stream_enum.hpp>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/optional.hpp>
 
 #include <chrono>
 #include <string>
@@ -23,6 +25,9 @@ namespace yandex{namespace contest{namespace invoker{
 
             std::size_t outputLimitBytes = 0;
             std::chrono::milliseconds terminationRealTimeLimit{0};
+
+            boost::optional<boost::filesystem::path> dumpJudge;
+            boost::optional<boost::filesystem::path> dumpSolution;
         };
 
         BUNSAN_INCLASS_STREAM_ENUM_INITIALIZED(Status,

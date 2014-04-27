@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
     SimpleBroker::Options options;
     std::uintmax_t terminationRealTimeLimitMillis;
 
+    std::string dumpJudge, dumpSolution;
+
     namespace po = boost::program_options;
     po::options_description desc("Usage");
     try
@@ -59,6 +61,18 @@ int main(int argc, char *argv[])
                 po::value<std::uintmax_t>(
                     &terminationRealTimeLimitMillis)->required(),
                 "termination real time limit in milliseconds"
+            )
+            (
+                "dump-judge",
+                po::value<std::string>(
+                    &dumpJudge),
+                "dump judge->solution data"
+            )
+            (
+                "dump-solution",
+                po::value<std::string>(
+                    &dumpSolution),
+                "dump solution->judge data"
             );
 
             po::variables_map vm;
@@ -71,6 +85,10 @@ int main(int argc, char *argv[])
             po::notify(vm);
             options.terminationRealTimeLimit =
                 std::chrono::milliseconds(terminationRealTimeLimitMillis);
+            if (vm.count("dump-judge"))
+                options.dumpJudge = dumpJudge;
+            if (vm.count("dump-solution"))
+                options.dumpSolution = dumpSolution;
 
             SimpleBroker broker(options);
             return static_cast<int>(broker.run());
