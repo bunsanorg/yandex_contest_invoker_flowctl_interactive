@@ -95,6 +95,38 @@ namespace yandex{namespace contest{namespace invoker{
 
     void BufferedConnection::start()
     {
+        if (dumpJudge_)
+        {
+            dumpJudgeStream_.reset(
+                new bunsan::filesystem::ofstream(
+                    *dumpJudge_,
+                    std::ios::binary
+                )
+            );
+            interactorToSolutionBuffer_.set_write_data_handler(boost::bind(
+                &BufferedConnection::handle_interactor_write_data,
+                this,
+                _1,
+                _2
+            ));
+        }
+
+        if (dumpSolution_)
+        {
+            dumpSolutionStream_.reset(
+                new bunsan::filesystem::ofstream(
+                    *dumpSolution_,
+                    std::ios::binary
+                )
+            );
+            solutionToInteractorBuffer_.set_read_data_handler(boost::bind(
+                &BufferedConnection::handle_solution_read_data,
+                this,
+                _1,
+                _2
+            ));
+        }
+
         interactorToSolutionBuffer_.start();
         solutionToInteractorBuffer_.start();
     }
@@ -161,6 +193,27 @@ namespace yandex{namespace contest{namespace invoker{
         }
     }
 
+    void BufferedConnection::handle_interactor_write_data(
+        const char *const data,
+        const std::size_t size)
+    {
+        if (!dumpJudgeStream_)
+            return;
+
+        if (data)
+        {
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(*dumpJudgeStream_)
+            {
+                dumpJudgeStream_->write(data, size);
+            }
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(*dumpJudgeStream_)
+        }
+        else
+        {
+            dumpJudgeStream_.reset();
+        }
+    }
+
     void BufferedConnection::handle_solution_read(
         const boost::system::error_code &ec,
         const std::size_t size)
@@ -178,6 +231,27 @@ namespace yandex{namespace contest{namespace invoker{
                 solutionEof();
             else
                 solutionReadError(ec, size);
+        }
+    }
+
+    void BufferedConnection::handle_solution_read_data(
+        const char *const data,
+        const std::size_t size)
+    {
+        if (!dumpSolutionStream_)
+            return;
+
+        if (data)
+        {
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(*dumpSolutionStream_)
+            {
+                dumpSolutionStream_->write(data, size);
+            }
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(*dumpSolutionStream_)
+        }
+        else
+        {
+            dumpSolutionStream_.reset();
         }
     }
 

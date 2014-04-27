@@ -88,6 +88,20 @@ namespace yandex{namespace contest{namespace invoker{
             options_.outputLimitBytes
         );
 
+        if (options_.dumpJudge)
+        {
+            STREAM_INFO << "Dumping judge's output into " <<
+                           *options_.dumpJudge;
+            connection.setDumpJudge(*options_.dumpJudge);
+        }
+
+        if (options_.dumpSolution)
+        {
+            STREAM_INFO << "Dumping solution's output into " <<
+                           *options_.dumpSolution;
+            connection.setDumpSolution(*options_.dumpSolution);
+        }
+
         STREAM_INFO << "Using " << options_.notifierFd << " " <<
                        "as notifier file descriptor";
         Notifier notifier(ioService, options_.notifierFd);

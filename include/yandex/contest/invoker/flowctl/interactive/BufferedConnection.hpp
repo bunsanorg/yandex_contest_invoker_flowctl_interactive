@@ -1,10 +1,13 @@
 #pragma once
 
 #include <bunsan/asio/buffer_connection.hpp>
+#include <bunsan/filesystem/fstream.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/signals2.hpp>
+
+#include <memory>
 
 namespace yandex{namespace contest{namespace invoker{
     namespace flowctl{namespace interactive
@@ -32,6 +35,16 @@ namespace yandex{namespace contest{namespace invoker{
             Connection &solutionSource,
             Connection &solutionSink,
             const std::size_t outputLimitBytes);
+
+        void setDumpJudge(const boost::filesystem::path &path)
+        {
+            dumpJudge_ = path;
+        }
+
+        void setDumpSolution(const boost::filesystem::path &path)
+        {
+            dumpSolution_ = path;
+        }
 
         void start();
 
@@ -63,13 +76,22 @@ namespace yandex{namespace contest{namespace invoker{
             const boost::system::error_code &ec,
             const std::size_t size);
 
+        void handle_interactor_write_data(
+            const char *const data,
+            const std::size_t size);
+
         void handle_solution_read(
             const boost::system::error_code &ec,
+            const std::size_t size);
+
+        void handle_solution_read_data(
+            const char *const data,
             const std::size_t size);
 
         void handle_solution_write(
             const boost::system::error_code &ec,
             const std::size_t size);
+
 
     private:
         Buffer interactorToSolutionBuffer_;
@@ -78,5 +100,10 @@ namespace yandex{namespace contest{namespace invoker{
         const std::size_t outputLimitBytes_;
         std::size_t interactorOutputBytes_ = 0;
         std::size_t solutionOutputBytes_ = 0;
+
+        boost::optional<boost::filesystem::path> dumpJudge_;
+        boost::optional<boost::filesystem::path> dumpSolution_;
+        std::unique_ptr<bunsan::filesystem::ofstream> dumpJudgeStream_;
+        std::unique_ptr<bunsan::filesystem::ofstream> dumpSolutionStream_;
     };
 }}}}}
