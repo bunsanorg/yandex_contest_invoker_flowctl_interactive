@@ -166,6 +166,13 @@ namespace yandex{namespace contest{namespace invoker{
         notifier.onError(
             [&](const Notifier::Error::Event &event)
             {
+                if (event.errorCode ==
+                    boost::asio::error::operation_aborted)
+                {
+                    STREAM_INFO << "Notification was canceled";
+                    return;
+                }
+
                 STREAM_ERROR << "Notification failure: " <<
                                 event.errorCode.message();
                 result(FAILED);
