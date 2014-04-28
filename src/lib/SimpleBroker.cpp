@@ -130,7 +130,7 @@ namespace yandex{namespace contest{namespace invoker{
                 boost::lock_guard<boost::mutex> lk(statusLock);
                 if (!status)
                 {
-                    ioService.stop();
+                    notifier.close();
                     status = status_;
                 }
             };
