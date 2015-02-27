@@ -2,18 +2,9 @@ project(yandex_contest_invoker_flowctl_interactive)
 
 include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-include(BunsanCommon)
-
-bunsan_use_boost(system filesystem serialization program_options)
-
-bunsan_use_bunsan(common)
-bunsan_use(
-    yandex_contest_common
-    yandex_contest_system
-    yandex_contest_invoker
-)
+find_package(BunsanCMake CONFIG REQUIRED)
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Broker.cpp
@@ -21,12 +12,15 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/SimpleBroker.cpp
     src/lib/CommandIo.cpp
 )
+bunsan_use_bunsan_package(${PROJECT_NAME} yandex_contest_invoker yandex_contest_invoker)
 
-yandex_contest_add_binary_targets(bin_targets
-    simple_broker
+bunsan_add_executable(${PROJECT_NAME}_simple_broker
+    src/bin/simple_broker.cpp
 )
+bunsan_use_target(${PROJECT_NAME}_simple_broker ${PROJECT_NAME})
 
 bunsan_install_headers()
 bunsan_install_targets(${PROJECT_NAME} ${bin_targets})
+bunsan_install_project()
 
 bunsan_include_tests()
