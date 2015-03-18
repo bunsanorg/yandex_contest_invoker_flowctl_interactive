@@ -1,6 +1,6 @@
 #include <yandex/contest/invoker/flowctl/interactive/BufferedConnection.hpp>
 
-#include <yandex/contest/detail/LogHelper.hpp>
+#include <yandex/contest/StreamLog.hpp>
 
 #include <boost/asio/detail/signal_init.hpp>
 
