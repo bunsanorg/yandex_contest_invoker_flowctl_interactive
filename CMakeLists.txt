@@ -4,7 +4,11 @@ include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
 project(yandex_contest_invoker_flowctl_interactive)
 
-find_package(BunsanCMake CONFIG REQUIRED)
+if(BunsanCMakeBuiltin)
+    BunsanCMakeLoad()
+else()
+    find_package(BunsanCMake CONFIG REQUIRED)
+endif()
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Broker.cpp
