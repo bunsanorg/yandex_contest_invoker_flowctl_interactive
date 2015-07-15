@@ -7,35 +7,38 @@
 
 #include <string>
 
-namespace yandex{namespace contest{namespace invoker{
-    namespace flowctl{namespace interactive
-{
-    class Broker: private boost::noncopyable
-    {
-    public:
-        struct Options
-        {
-            std::string requestDelimiter;
-            std::string responseDelimiter;
+namespace yandex {
+namespace contest {
+namespace invoker {
+namespace flowctl {
+namespace interactive {
 
-            int interactorBrokerFd = -1;
-            int brokerInteractorFd = -1;
-            int solutionBrokerFd = -1;
-            int brokerSolutionFd = -1;
+class Broker : private boost::noncopyable {
+ public:
+  struct Options {
+    std::string requestDelimiter;
+    std::string responseDelimiter;
 
-            bool emptyFirstRequest = false;
-        };
+    int interactorBrokerFd = -1;
+    int brokerInteractorFd = -1;
+    int solutionBrokerFd = -1;
+    int brokerSolutionFd = -1;
 
-        BUNSAN_INCLASS_STREAM_ENUM(Status,
-        (
-            OK
-        ))
+    bool emptyFirstRequest = false;
+  };
 
-        explicit Broker(const Options &options);
+  BUNSAN_INCLASS_STREAM_ENUM(Status, (OK))
 
-        Status run();
+  explicit Broker(const Options &options);
 
-    private:
-        Options options_;
-    };
-}}}}}
+  Status run();
+
+ private:
+  Options options_;
+};
+
+}  // namespace interactive
+}  // namespace flowctl
+}  // namespace invoker
+}  // namespace contest
+}  // namespace yandex

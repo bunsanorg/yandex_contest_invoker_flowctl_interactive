@@ -9,101 +9,85 @@
 
 #include <memory>
 
-namespace yandex{namespace contest{namespace invoker{
-    namespace flowctl{namespace interactive
-{
-    class BufferedConnection: private boost::noncopyable
-    {
-    public:
-        typedef boost::asio::posix::stream_descriptor Connection;
+namespace yandex {
+namespace contest {
+namespace invoker {
+namespace flowctl {
+namespace interactive {
 
-        typedef bunsan::asio::buffer_connection<
-            Connection,
-            Connection
-        > Buffer;
+class BufferedConnection : private boost::noncopyable {
+ public:
+  using Connection = boost::asio::posix::stream_descriptor;
+  using Buffer = bunsan::asio::buffer_connection<Connection, Connection>;
+  using StaticEventSignal = boost::signals2::signal<void()>;
+  using ErrorSignal =
+      boost::signals2::signal<void(boost::system::error_code, std::size_t)>;
 
-        typedef boost::signals2::signal<void ()> StaticEventSignal;
+ public:
+  BufferedConnection(Connection &interactorSource, Connection &interactorSink,
+                     Connection &solutionSource, Connection &solutionSink,
+                     const std::size_t outputLimitBytes);
 
-        typedef boost::signals2::signal<
-            void (boost::system::error_code, std::size_t)
-        > ErrorSignal;
+  void setDumpJudge(const boost::filesystem::path &path) { dumpJudge_ = path; }
 
-    public:
-        BufferedConnection(
-            Connection &interactorSource,
-            Connection &interactorSink,
-            Connection &solutionSource,
-            Connection &solutionSink,
-            const std::size_t outputLimitBytes);
+  void setDumpSolution(const boost::filesystem::path &path) {
+    dumpSolution_ = path;
+  }
 
-        void setDumpJudge(const boost::filesystem::path &path)
-        {
-            dumpJudge_ = path;
-        }
+  void start();
 
-        void setDumpSolution(const boost::filesystem::path &path)
-        {
-            dumpSolution_ = path;
-        }
+  void closeInteractorToSolution();
+  void closeSolutionToInteractor();
+  void close();
 
-        void start();
+  void terminateInteractorToSolution();
+  void terminateSolutionToInteractor();
+  void terminate();
 
-        void closeInteractorToSolution();
-        void closeSolutionToInteractor();
-        void close();
+  StaticEventSignal interactorEof;
+  StaticEventSignal solutionEof;
 
-        void terminateInteractorToSolution();
-        void terminateSolutionToInteractor();
-        void terminate();
+  StaticEventSignal interactorOutputLimitExceeded;
+  StaticEventSignal solutionOutputLimitExceeded;
 
-        StaticEventSignal interactorEof;
-        StaticEventSignal solutionEof;
+  ErrorSignal interactorReadError;
+  ErrorSignal interactorWriteError;
+  ErrorSignal solutionReadError;
+  ErrorSignal solutionWriteError;
 
-        StaticEventSignal interactorOutputLimitExceeded;
-        StaticEventSignal solutionOutputLimitExceeded;
+ private:
+  void handle_interactor_read(const boost::system::error_code &ec,
+                              std::size_t size);
 
-        ErrorSignal interactorReadError;
-        ErrorSignal interactorWriteError;
-        ErrorSignal solutionReadError;
-        ErrorSignal solutionWriteError;
+  void handle_interactor_write(const boost::system::error_code &ec,
+                               std::size_t size);
 
-    private:
-        void handle_interactor_read(
-            const boost::system::error_code &ec,
-            const std::size_t size);
+  void handle_interactor_write_data(const char *data, std::size_t size);
 
-        void handle_interactor_write(
-            const boost::system::error_code &ec,
-            const std::size_t size);
+  void handle_solution_read(const boost::system::error_code &ec,
+                            std::size_t size);
 
-        void handle_interactor_write_data(
-            const char *const data,
-            const std::size_t size);
+  void handle_solution_read_data(const char *data, std::size_t size);
 
-        void handle_solution_read(
-            const boost::system::error_code &ec,
-            const std::size_t size);
+  void handle_solution_write(const boost::system::error_code &ec,
+                             std::size_t size);
 
-        void handle_solution_read_data(
-            const char *const data,
-            const std::size_t size);
+ private:
+  Buffer interactorToSolutionBuffer_;
+  Buffer solutionToInteractorBuffer_;
 
-        void handle_solution_write(
-            const boost::system::error_code &ec,
-            const std::size_t size);
+  const std::size_t outputLimitBytes_;
+  std::size_t interactorOutputBytes_ = 0;
+  std::size_t solutionOutputBytes_ = 0;
 
+  boost::optional<boost::filesystem::path> dumpJudge_;
+  boost::optional<boost::filesystem::path> dumpSolution_;
+  std::unique_ptr<bunsan::filesystem::ofstream> dumpJudgeStream_;
+  std::unique_ptr<bunsan::filesystem::ofstream> dumpSolutionStream_;
+};
 
-    private:
-        Buffer interactorToSolutionBuffer_;
-        Buffer solutionToInteractorBuffer_;
-
-        const std::size_t outputLimitBytes_;
-        std::size_t interactorOutputBytes_ = 0;
-        std::size_t solutionOutputBytes_ = 0;
-
-        boost::optional<boost::filesystem::path> dumpJudge_;
-        boost::optional<boost::filesystem::path> dumpSolution_;
-        std::unique_ptr<bunsan::filesystem::ofstream> dumpJudgeStream_;
-        std::unique_ptr<bunsan::filesystem::ofstream> dumpSolutionStream_;
-    };
-}}}}}
+}  // namespace interactive
+}  // namespace flowctl
+}  // namespace invoker
+}  // namespace contest
+}  // namespace yandex
