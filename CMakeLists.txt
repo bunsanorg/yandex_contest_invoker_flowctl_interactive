@@ -24,7 +24,7 @@ bunsan_add_executable(${PROJECT_NAME}_simple_broker
 bunsan_use_target(${PROJECT_NAME}_simple_broker ${PROJECT_NAME})
 
 bunsan_install_headers()
-bunsan_install_targets(${PROJECT_NAME} ${bin_targets})
+bunsan_install_targets(${PROJECT_NAME} ${PROJECT_NAME}_simple_broker)
 bunsan_install_project()
 
 bunsan_include_tests()
