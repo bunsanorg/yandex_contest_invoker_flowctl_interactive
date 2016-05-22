@@ -1,5 +1,10 @@
 #pragma once
 
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106100
+#define BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#endif
+
 #include <bunsan/asio/buffer_connection.hpp>
 #include <bunsan/filesystem/fstream.hpp>
 
