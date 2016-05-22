@@ -8,9 +8,8 @@
 #include <boost/asio/steady_timer.hpp>
 #include <boost/io/detail/quoted_manip.hpp>
 #include <boost/optional.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/once.hpp>
+
+#include <mutex>
 
 namespace yandex {
 namespace contest {
@@ -27,19 +26,19 @@ struct TerminationTimer {
 
   template <typename Duration, typename F>
   void async_wait(const Duration &duration, const F &f) {
-    boost::call_once([this, duration, f]() {
+    std::call_once(flag, [this, duration, f]() {
       timer.expires_from_now(duration);
       timer.async_wait(f);
-    }, flag);
+    });
   }
 
   void cancel() {
-    boost::call_once([]() {}, flag);
+    std::call_once(flag, []() {});
     timer.cancel();
   }
 
   boost::asio::steady_timer timer;
-  boost::once_flag flag;
+  std::once_flag flag;
 };
 }  // namespace
 
@@ -87,7 +86,7 @@ SimpleBroker::Status SimpleBroker::run() {
   TerminationTimer interactorTerminationTimer(ioService);
   TerminationTimer solutioninTerminationTimer(ioService);
 
-  boost::mutex statusLock;
+  std::mutex statusLock;
   boost::optional<Status> status;
 
   using TerminationSignal = boost::signals2::signal<void(
@@ -102,7 +101,7 @@ SimpleBroker::Status SimpleBroker::run() {
   bool solutionExcessData = false;
 
   const auto result = [&](const Status status_) {
-    boost::lock_guard<boost::mutex> lk(statusLock);
+    std::lock_guard<std::mutex> lk(statusLock);
     if (!status) {
       notifier.close();
       status = status_;
